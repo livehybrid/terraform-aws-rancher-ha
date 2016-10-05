@@ -1,0 +1,17 @@
+# aws access and secret keys
+access_key = ""
+secret_key = ""
+
+# ssh key
+key_name = "rancher"
+key_path = "./ssh/rancher"
+
+r53_zone_id = "Z3OXMTMAI8DBHV"
+
+# database password rancher uses to connect to RDS
+database_password = ""
+database_encrypted_password = ""
+
+# rancher stuff
+fqdn = ""
+ha_encryption_key = ""
