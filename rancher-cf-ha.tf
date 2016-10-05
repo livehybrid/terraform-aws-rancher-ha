@@ -92,7 +92,7 @@ resource "aws_autoscaling_group" "rancher_ha" {
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.rancher_ha.name}"
   load_balancers            = ["${aws_elb.rancher_ha.name}"]
-  availability_zones        = ["${var.region}a", "${var.region}b", "${var.region}d"]
+  vpc_zone_identifier       = ["${aws_vpc.rancher_ha.id}"]
 
   tag {
     key                 = "Name"
