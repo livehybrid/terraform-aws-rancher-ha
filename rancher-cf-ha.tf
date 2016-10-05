@@ -26,7 +26,6 @@ provider "aws" {
 # Elastic Load Balancer
 resource "aws_elb" "rancher_ha" {
   name                      = "rancher-ha"
-  availability_zones        = ["${var.az1}", "${var.az2}", "${var.az3}"]
   cross_zone_load_balancing = true
   internal                  = false
   security_groups           = ["${aws_security_group.rancher_ha_web_elb.id}"]
@@ -56,6 +55,11 @@ resource "aws_elb" "rancher_ha" {
   }
 }
 
+resource "aws_key_pair" "rancher" {
+    key_name = "${var.key_name}"
+    public_key = "${file("${var.key_path}.pub")}"
+}
+
 resource "aws_proxy_protocol_policy" "rancher_ha" {
   load_balancer  = "${aws_elb.rancher_ha.name}"
   instance_ports = ["81", "444"]
@@ -72,7 +76,7 @@ resource "aws_launch_configuration" "rancher_ha" {
   ]
 
   instance_type               = "${var.instance_type}"
-  key_name                    = "${var.key_name}"
+  key_name                    = "${aws_key_pair.rancher.key_name}"
   user_data                   = "${data.template_file.user_data.rendered}"
   associate_public_ip_address = false
   ebs_optimized               = false
@@ -88,7 +92,7 @@ resource "aws_autoscaling_group" "rancher_ha" {
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.rancher_ha.name}"
   load_balancers            = ["${aws_elb.rancher_ha.name}"]
-  availability_zones        = ["${var.az1}", "${var.az2}", "${var.az3}"]
+  availability_zones        = ["${var.region}a", "${var.region}b", "${var.region}d"]
 
   tag {
     key                 = "Name"

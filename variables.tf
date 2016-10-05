@@ -14,18 +14,6 @@ variable "region" {
   description = "The region of AWS, for AMI lookups."
 }
 
-variable "az1" {
-  default = "us-east-1a"
-}
-
-variable "az2" {
-  default = "us-east-1b"
-}
-
-variable "az3" {
-  default = "us-east-1d"
-}
-
 variable "ami" {
   description = "AWS RancherOS AMI ID"
 
