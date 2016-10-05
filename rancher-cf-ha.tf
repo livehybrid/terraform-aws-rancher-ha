@@ -31,6 +31,12 @@ resource "aws_elb" "rancher_ha" {
   internal                  = false
   security_groups           = ["${aws_security_group.rancher_ha_web_elb.id}"]
 
+  subnets = [
+    "${aws_subnet.rancher_ha_a.id}",
+    "${aws_subnet.rancher_ha_b.id}",
+    "${aws_subnet.rancher_ha_d.id}",
+  ]
+
   listener {
     instance_port      = 81
     instance_protocol  = "tcp"
@@ -48,8 +54,6 @@ resource "aws_elb" "rancher_ha" {
     target   = "HTTP:80/ping"
     interval = 7
   }
-
-  cross_zone_load_balancing = true
 }
 
 resource "aws_proxy_protocol_policy" "rancher_ha" {
