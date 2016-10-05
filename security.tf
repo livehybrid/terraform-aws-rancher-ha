@@ -2,7 +2,7 @@
 resource "aws_security_group" "rancher_ha_allow_db" {
   name        = "rancher_ha_allow_db"
   description = "Allow Connection from internal"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${aws_vpc.rancher_ha.id}"
 
   egress {
     from_port   = 0
@@ -23,7 +23,7 @@ resource "aws_security_group" "rancher_ha_allow_db" {
 resource "aws_security_group" "rancher_ha_web_elb" {
   name        = "rancher_ha_web_elb"
   description = "Allow ports rancher "
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${aws_vpc.rancher_ha.id}"
 
   egress {
     from_port   = 0
@@ -44,6 +44,7 @@ resource "aws_security_group" "rancher_ha_web_elb" {
 resource "aws_security_group" "rancher_ha_allow_elb" {
   name        = "rancher_ha_allow_elb"
   description = "Allow Connection from elb"
+  vpc_id      = "${aws_vpc.rancher_ha.id}"
 
   egress {
     from_port   = 0
@@ -85,7 +86,7 @@ resource "aws_security_group" "rancher_ha_allow_elb" {
 resource "aws_security_group" "rancher_ha_allow_internal" {
   name        = "rancher_ha_allow_internal"
   description = "Allow Connection from internal"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${aws_vpc.rancher_ha.id}"
 
   egress {
     from_port   = 0

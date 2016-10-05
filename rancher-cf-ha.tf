@@ -4,13 +4,13 @@ data "template_file" "user_data" {
 
   vars {
     # Database
-    database_address            = "${aws_db_instance.rancherdb.address}"
+    database_address            = "${aws_rds_cluster.rancher_ha.endpoint}"
     database_port               = "${var.database_port}"
     database_name               = "${var.database_name}"
     database_username           = "${var.database_username}"
     database_password           = "${var.database_password}"
     database_encrypted_password = "${var.database_encrypted_password}"
-    ha_registration_url         = "${var.ha_registration_url}"
+    ha_registration_url         = "https://${var.fqdn}"
     scale_desired_size          = "${var.ha_size}"
     rancher_version             = "${var.rancher_version}"
 
@@ -60,7 +60,7 @@ resource "aws_proxy_protocol_policy" "rancher_ha" {
 # rancher resource
 resource "aws_launch_configuration" "rancher_ha" {
   name_prefix = "Launch-Config-rancher-server-ha"
-  image_id    = "${var.ami_id}"
+  image_id    = "${lookup(var.ami, var.region)}"
 
   security_groups = ["${aws_security_group.rancher_ha_allow_elb.id}",
     "${aws_security_group.rancher_ha_web_elb.id}",
@@ -99,7 +99,7 @@ output "elb_dns" {
 
 resource "aws_route53_record" "rancher" {
   zone_id = "${var.r53_zone_id}"
-  name    = "pointsaws.com"
+  name    = "${var.fqdn}"
   type    = "A"
 
   alias {

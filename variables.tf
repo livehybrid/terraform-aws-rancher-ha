@@ -10,12 +10,25 @@ variable "secret_key" {
 }
 
 variable "region" {
-  default   = "us-east-1"
+  default     = "us-east-1"
   description = "The region of AWS, for AMI lookups."
+}
+
+variable "az1" {
+  default = "us-east-1a"
+}
+
+variable "az2" {
+  default = "us-east-1b"
+}
+
+variable "az3" {
+  default = "us-east-1d"
 }
 
 variable "ami" {
   description = "AWS RancherOS AMI ID"
+
   default {
     us-east-1 = "ami-a8d2a4bf"
     us-west-1 = "ami-fccb879c"
@@ -24,59 +37,78 @@ variable "ami" {
 }
 
 variable "tag_name" {
-  default   = "rancher-ha"
+  default     = "rancher-ha"
   description = "Name tag for the servers"
 }
 
 variable "key_name" {
-  default = "rancher-example"
+  default     = "rancher-example"
   description = "SSH key name in your AWS account for AWS instances."
 }
 
 variable "key_path" {
-  default = "~/.ssh/rancher-example"
+  default     = "~/.ssh/rancher-example"
   description = "Local path of the SSH private key"
 }
 
 variable "ha_size" {
-  default = "3"
+  default     = "3"
   description = "The number of nodes in the HA cluster; three (3) or five (5)."
 }
 
-variable "ami_id" {}
+variable "instance_type" {
+  default     = "t2.large"          # RAM Requirements >= 4gb
+  description = "AWS Instance type"
+}
 
-variable "instance_type" {}
+variable "r53_zone_id" {
+  description = "The Route53 zone ID"
+}
 
-variable "database_port" {}
+#------------------------------------------#
+# RDS Environment Values
+#------------------------------------------#
+variable "database_instance_class" {
+  description = "RDS instance class"
+  default     = "db.r3.large"
+}
 
-variable "database_name" {}
+variable "database_name" {
+  description = "Name of the database"
+  default     = "rancher"
+}
 
-variable "database_username" {}
+variable "database_port" {
+  description = "Port for the database"
+  default     = "3306"
+}
 
-variable "database_password" {}
+variable "database_username" {
+  description = "Username for the database"
+  default     = "rancher"
+}
 
-variable "database_encrypted_password" {}
+variable "database_password" {
+  description = "Password for the database"
+}
+
+variable "database_encrypted_password" {
+  description = "Encrypted password for the database"
+}
+
+#------------------------------------------#
+
+# Rancher Environment Values
+
+#------------------------------------------#
 
 variable "ha_encryption_key" {}
 
-variable "ha_registration_url" {}
+variable "fqdn" {
+  description = "URL that the Rancher cluster will be accessible via"
+}
 
-variable "vpc_id" {}
-
-variable "az1" {}
-
-variable "az2" {}
-
-variable "az3" {}
-
-variable "zone_id" {}
-
-variable "fqdn" {}
-
-variable "database_instance_class" {}
-
-variable "rancher_version" {}
-
-variable "r53_zone_id" {}
-
-variable "rancher_endpoint_name" {}
+variable "rancher_version" {
+  description = "The Rancher version to use/install"
+  default     = "rancher/server:v1.2.0-pre3"
+}

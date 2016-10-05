@@ -14,7 +14,7 @@ resource "acme_registration" "reg" {
 resource "acme_certificate" "certificate" {
   server_url      = "https://acme-v01.api.letsencrypt.org/directory"
   account_key_pem = "${tls_private_key.private_key.private_key_pem}"
-  common_name     = "${var.rancher_endpoint_name}"
+  common_name     = "${var.fqdn}"
 
   dns_challenge {
     provider = "route53"
