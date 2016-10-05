@@ -33,7 +33,7 @@ resource "aws_elb" "rancher_ha" {
   subnets = [
     "${aws_subnet.rancher_ha_a.id}",
     "${aws_subnet.rancher_ha_b.id}",
-    "${aws_subnet.rancher_ha_d.id}",
+    "${aws_subnet.rancher_ha_d.id}"
   ]
 
   listener {
@@ -92,7 +92,11 @@ resource "aws_autoscaling_group" "rancher_ha" {
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.rancher_ha.name}"
   load_balancers            = ["${aws_elb.rancher_ha.name}"]
-  vpc_zone_identifier       = ["${aws_vpc.rancher_ha.id}"]
+  vpc_zone_identifier       = [
+    "${aws_subnet.rancher_ha_a.id}",
+    "${aws_subnet.rancher_ha_b.id}",
+    "${aws_subnet.rancher_ha_d.id}"
+  ]
 
   tag {
     key                 = "Name"
