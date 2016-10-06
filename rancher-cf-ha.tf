@@ -37,7 +37,7 @@ resource "aws_elb" "rancher_ha" {
   ]
 
   listener {
-    instance_port      = 81
+    instance_port      = 18080
     instance_protocol  = "tcp"
     lb_port            = 443
     lb_protocol        = "ssl"
@@ -62,7 +62,7 @@ resource "aws_key_pair" "rancher" {
 
 resource "aws_proxy_protocol_policy" "rancher_ha" {
   load_balancer  = "${aws_elb.rancher_ha.name}"
-  instance_ports = ["81", "444"]
+  instance_ports = ["18080", "444"]
 }
 
 # rancher resource

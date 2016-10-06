@@ -18,9 +18,9 @@ variable "ami" {
   description = "AWS RancherOS AMI ID"
 
   default {
-    us-east-1 = "ami-a8d2a4bf"
-    us-west-1 = "ami-fccb879c"
-    us-west-2 = "ami-1ed3007e"
+    us-east-1 = "ami-af7d0bb8"
+    us-west-1 = "ami-baca86da"
+    us-west-2 = "ami-e2d60582"
   }
 }
 
@@ -98,5 +98,5 @@ variable "fqdn" {
 
 variable "rancher_version" {
   description = "The Rancher version to use/install"
-  default     = "rancher/server:v1.2.0-pre3"
+  default     = "rancher/server:v1.1.4"
 }
