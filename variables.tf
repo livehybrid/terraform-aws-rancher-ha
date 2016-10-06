@@ -18,9 +18,9 @@ variable "ami" {
   description = "AWS RancherOS AMI ID"
 
   default {
-    us-east-1 = "ami-af7d0bb8"
-    us-west-1 = "ami-baca86da"
-    us-west-2 = "ami-e2d60582"
+    us-east-1 = "ami-880f12e2"
+    us-west-1 = "ami-ea7a058a"
+    us-west-2 = "ami-4f50a72f"
   }
 }
 
