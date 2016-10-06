@@ -6,7 +6,7 @@ secret_key = ""
 key_name = "rancher"
 key_path = "./ssh/rancher"
 
-r53_zone_id = "Z3OXMTMAI8DBHV"
+r53_zone_id = ""
 
 # database password rancher uses to connect to RDS
 database_password = ""

@@ -1,66 +1,39 @@
-#Terraform script to stand up Rancher HA cluster on AWS
-This build on the work I did with Nick and the original can be download from https://github.com/nicksuckling/rancher-ha-server-aws/tree/develop
+# Terraform AWS ASG for RancherOS
 
-This script will setup HA on AWS with SSL terminating on an ELB with an appropriately configured variable file.
+Based on work done by Chris Urwin and Ahmad Emneina located on [GitHub](https://github.com/chrisurwin/terraform-aws-rancher-ha).
+
+This script will setup HA on AWS with SSL terminating on an ELB with an appropriately configured variable file.  It will also configure Route 53 to give the ELB a nicely resolvable URL.  You **must** have access to a domain in Route 53 for this to work; the `r53_zone_id` variable points to the given domain.
+
 This was developed so that it should be simple for someone to stand up a Rancher HA server and test its functionality.
 
-It will create the appropriate security groups, ELB, RDS and EC2 instances
+It will create the appropriate security groups, ELB, RDS and EC2 instances.
 
-#Usage
+# Usage
+
 You will need to get the encryption key and the encrypted database password prior to using this script.
-I would suggest standing up a test instance with the password that is required, generating the HA script and then using those values for a deployment.
-As a test you can use the values below for database_password, database_encrypted_password and ha_encryption_key but I wouldn’t suggest running this as your production instance.
 
-If you clone the repo and create a terraform.vars with the following entries populated, I’ve included sample data to ease the learning curve:
+To get the encryption key and encrypted database password, run the `enc-password.sh` script located in the `files` directory.
 
-name = "rancher-ha"
+Generate an SSH key to use to connect to the RancherOS instances: `ssh-keygen -t rsa -b 4096 -f ssh/rancher -N ''` - you can call it whatever you want, as long as the `key_path` points to the right file.
 
-ami_id = "ami-xxxxxxx"
+Then, populate a `terraform.tfvars` file with the following _mandatory_ properties.  (Optional defaults can be found in `variables.tf` and changed if desired.)  The easiest way to do this is to copy the `terraform.tfvars.template` file and simply populate the fields.
 
-instance_type = "t2.medium"
+```haml
+# aws access and secret keys
+access_key = ""
+secret_key = ""
 
-database_instance_class = "db.t2.medium"
+# ssh key
+key_name = "rancher"
+key_path = "./ssh/rancher"
 
-key_name = "aws_ssh_key_name"
+r53_zone_id = ""
 
-rancher_ssl_cert = "certificate.crt"
+# database password rancher uses to connect to RDS
+database_password = ""
+database_encrypted_password = ""
 
-rancher_ssl_key = "private.key"
-
-rancher_ssl_chain = "ca_bundle.crt"
-
-database_port = "3306"
-
-database_name = "cattle"
-
-database_username = "cattle"
-
-database_password = "Password"
-
-database_encrypted_password = "5174b161cc63834d652c2d1d85f9d86b:1ac7f229e9f240c1c2f6aa07d3c23e11" #this os Password encrypted using the encryption key below
-
-ha_encryption_key = "N7sAQCFYvnOvrpStF5rHeDZfat9dFddhxxuI7T2Aykw="
-
-scale_min_size = "3"
-
-scale_max_size = "3"
-
-scale_desired_size = "3"
-
-ha_registration_url = "https://www.yoururl.com"
-
-fqdn = "www.yoururl.com"
-
-zone_id = "hosted zone id for your domain"
-
-region = "eu-west-1"
-
-vpc_id = "vpc-xxx"
-
-az1 = "eu-west-1a"
-
-az2 = "eu-west-1b"
-
-az3 = "eu-west-1c"
-
-rancher_version = "rancher/server:v1.2.0-pre1"
+# rancher stuff
+fqdn = ""
+ha_encryption_key = ""
+```
