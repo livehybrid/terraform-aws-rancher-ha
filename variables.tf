@@ -104,7 +104,7 @@ variable "fqdn" {
 
 variable "rancher_version" {
   description = "The Rancher version to use/install"
-  default     = "rancher/server:v1.2"
+  default     = "rancher/server:v1.2.0"
 }
 
 variable "email" {

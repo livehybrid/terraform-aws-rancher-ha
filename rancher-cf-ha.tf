@@ -23,55 +23,61 @@ provider "aws" {
   region = "${var.region}"
 }
 
-# Elastic Load Balancer
-resource "aws_elb" "rancher_ha" {
-  name                      = "rancher-ha"
-  cross_zone_load_balancing = true
-  internal                  = false
-  security_groups           = ["${aws_security_group.rancher_ha_web_elb.id}"]
 
+# Application Load Balancer
+resource "aws_alb_target_group" "rancher-ha-tg" {
+  name     = "rancher-ha-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    path = "/ping"
+    port = 8080
+    protocol = "HTTP"
+    interval = 30
+  }
+}
+
+resource "aws_alb" "rancher_ha" {
+  name            = "rancher"
   subnets = [
     "${aws_subnet.rancher_ha_a.id}",
     "${aws_subnet.rancher_ha_b.id}",
-    "${aws_subnet.rancher_ha_d.id}"
+    "${aws_subnet.rancher_ha_c.id}"
   ]
+  security_groups = ["${aws_security_group.rancher_ha_web_alb.id}"]
+}
 
-  listener {
-    instance_port      = 81
-    instance_protocol  = "tcp"
-    lb_port            = 443
-    lb_protocol        = "ssl"
-    ssl_certificate_id = "${aws_iam_server_certificate.rancher_ha.arn}"
-  }
+resource "aws_alb_listener" "front_end" {
+  load_balancer_arn = "${aws_alb.rancher_ha.id}"
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn   = "${aws_iam_server_certificate.rancher_ha.arn}"
 
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 4
-    timeout             = 5
-
-    # target = "TCP:22"
-    target   = "HTTP:18080/ping"
-    interval = 7
+  default_action {
+    target_group_arn = "${aws_alb_target_group.rancher-ha-tg.id}"
+    type             = "forward"
   }
 }
+
+
 
 resource "aws_key_pair" "rancher" {
     key_name = "${var.key_name}"
     public_key = "${file("${var.key_path}.pub")}"
 }
 
-resource "aws_proxy_protocol_policy" "rancher_ha" {
-  load_balancer  = "${aws_elb.rancher_ha.name}"
-  instance_ports = ["81", "444"]
-}
 
 # rancher resource
 resource "aws_launch_configuration" "rancher_ha" {
   name_prefix = "Launch-Config-rancher-server-ha"
   image_id    = "${lookup(var.ami, var.region)}"
 
-  security_groups = ["${aws_security_group.rancher_ha_allow_elb.id}",
-    "${aws_security_group.rancher_ha_web_elb.id}",
+  security_groups = ["${aws_security_group.rancher_ha_allow_alb.id}",
+    "${aws_security_group.rancher_ha_web_alb.id}",
     "${aws_security_group.rancher_ha_allow_internal.id}",
   ]
 
@@ -87,15 +93,14 @@ resource "aws_autoscaling_group" "rancher_ha" {
   min_size                  = "${var.ha_size}"
   max_size                  = "${var.ha_size}"
   desired_capacity          = "${var.ha_size}"
-  health_check_grace_period = 900
-  health_check_type         = "ELB"
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.rancher_ha.name}"
-  load_balancers            = ["${aws_elb.rancher_ha.name}"]
+  target_group_arns = ["${aws_alb_target_group.rancher-ha-tg.arn}"]
+
   vpc_zone_identifier       = [
     "${aws_subnet.rancher_ha_a.id}",
     "${aws_subnet.rancher_ha_b.id}",
-    "${aws_subnet.rancher_ha_d.id}"
+    "${aws_subnet.rancher_ha_c.id}"
   ]
 
   tag {
@@ -107,8 +112,8 @@ resource "aws_autoscaling_group" "rancher_ha" {
   depends_on = ["aws_rds_cluster_instance.rancher_ha"]
 }
 
-output "elb_dns" {
-  value = "${aws_elb.rancher_ha.dns_name}"
+output "alb_dns" {
+  value = "${aws_alb.rancher_ha.dns_name}"
 }
 
 resource "aws_route53_record" "rancher" {
@@ -117,8 +122,8 @@ resource "aws_route53_record" "rancher" {
   type    = "A"
 
   alias {
-    name                   = "${aws_elb.rancher_ha.dns_name}"
-    zone_id                = "${aws_elb.rancher_ha.zone_id}"
+    name                   = "${aws_alb.rancher_ha.dns_name}"
+    zone_id                = "${aws_alb.rancher_ha.zone_id}"
     evaluate_target_health = true
   }
 }
