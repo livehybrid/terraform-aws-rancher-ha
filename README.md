@@ -8,6 +8,12 @@ This was developed so that it should be simple for someone to stand up a Rancher
 
 It will create the appropriate security groups, ELB, RDS and EC2 instances.
 
+# Prep Work
+
+You will need to install the ACME plugin for Terraform:
+https://github.com/paybyphone/terraform-provider-acme/releases
+https://www.terraform.io/docs/plugins/basics.html
+
 # Usage
 
 You will need to get the encryption key and the encrypted database password prior to using this script.

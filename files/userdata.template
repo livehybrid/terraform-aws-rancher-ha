@@ -94,7 +94,7 @@ write_files:
       fi
 
       docker rm -fv rancher-ha >/dev/null 2>&1 || true
-      ID=`docker run --restart=always -d -v /var/run/docker.sock:/var/run/docker.sock --name rancher-ha --net host --privileged -v /var/lib/rancher/etc:/var/lib/rancher/etc $IMAGE ha`
+      ID=`docker run --restart=always -d -v /var/run/docker.sock:/var/run/docker.sock --name rancher-ha --net host --privileged -v /var/lib/rancher/etc:/var/lib/rancher/etc $IMAGE`
 
       echo Started container rancher-ha $ID
       echo Run the below to see the logs

@@ -21,7 +21,13 @@ variable "ami" {
     us-east-1 = "ami-812ec0ec"
     us-west-1 = "ami-ea7a058a"
     us-west-2 = "ami-4f50a72f"
+    eu-west-1 = "ami-c62170b5"
   }
+}
+
+variable "vpc_id" {
+  default = "xxx"
+  description = "The ID of your VPC"
 }
 
 variable "tag_name" {
@@ -98,5 +104,10 @@ variable "fqdn" {
 
 variable "rancher_version" {
   description = "The Rancher version to use/install"
-  default     = "rancher/server:v1.1.4"
+  default     = "rancher/server:v1.2"
+}
+
+variable "email" {
+  description = "Your email address to create SSL Cert against"
+  default     = "bob@google.com"
 }

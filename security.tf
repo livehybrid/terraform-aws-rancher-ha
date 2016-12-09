@@ -19,31 +19,29 @@ resource "aws_security_group" "rancher_ha_allow_db" {
   }
 }
 
-# Into ELB from upstream
-resource "aws_security_group" "rancher_ha_web_elb" {
-  name        = "rancher_ha_web_elb"
-  description = "Allow ports rancher "
-  vpc_id      = "${aws_vpc.rancher_ha.id}"
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+# Into ALB from upstream
+resource "aws_security_group" "rancher_ha_web_alb" {
+  name = "rancher_ha_web_alb"
+  description = "Allow Inbound https"
+  vpc_id = "${var.vpc_id}"
+   egress {
+     from_port = 0
+     to_port = 0
+     protocol = "-1"
+     cidr_blocks = ["0.0.0.0/0"]
+   }
+   ingress {
+      from_port = 443
+      to_port = 443
+      protocol = "tcp"
+     cidr_blocks = ["0.0.0.0/0"]
+   }
 }
 
 #Into servers
-resource "aws_security_group" "rancher_ha_allow_elb" {
-  name        = "rancher_ha_allow_elb"
-  description = "Allow Connection from elb"
+resource "aws_security_group" "rancher_ha_allow_alb" {
+  name        = "rancher_ha_allow_alb"
+  description = "Allow Connection from alb"
   vpc_id      = "${aws_vpc.rancher_ha.id}"
 
   egress {
@@ -54,32 +52,12 @@ resource "aws_security_group" "rancher_ha_allow_elb" {
   }
 
   ingress {
-    from_port       = 81
-    to_port         = 81
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.rancher_ha_web_elb.id}"]
+    security_groups = ["${aws_security_group.rancher_ha_web_alb.id}"]
   }
 
-  ingress {
-    from_port       = 444
-    to_port         = 444
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.rancher_ha_web_elb.id}"]
-  }
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.rancher_ha_web_elb.id}"]
-  }
-
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.rancher_ha_web_elb.id}"]
-  }
 }
 
 #Direct into Rancher HA instances

@@ -33,10 +33,10 @@ resource "aws_subnet" "rancher_ha_b" {
   }
 }
 
-resource "aws_subnet" "rancher_ha_d" {
+resource "aws_subnet" "rancher_ha_c" {
   vpc_id                  = "${aws_vpc.rancher_ha.id}"
   cidr_block              = "192.168.99.192/26"
-  availability_zone       = "${var.region}d"
+  availability_zone       = "${var.region}c"
   map_public_ip_on_launch = true
 
   tags {
