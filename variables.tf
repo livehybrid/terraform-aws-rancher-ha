@@ -22,6 +22,7 @@ variable "ami" {
     us-west-1 = "ami-ea7a058a"
     us-west-2 = "ami-4f50a72f"
     eu-west-1 = "ami-c62170b5"
+    eu-west-2 = "ami-65e8e201"
   }
 }
 

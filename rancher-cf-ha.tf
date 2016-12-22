@@ -45,8 +45,7 @@ resource "aws_alb" "rancher_ha" {
   name            = "rancher"
   subnets = [
     "${aws_subnet.rancher_ha_a.id}",
-    "${aws_subnet.rancher_ha_b.id}",
-    "${aws_subnet.rancher_ha_c.id}"
+    "${aws_subnet.rancher_ha_b.id}"
   ]
   security_groups = ["${aws_security_group.rancher_ha_web_alb.id}"]
 }
@@ -99,8 +98,7 @@ resource "aws_autoscaling_group" "rancher_ha" {
 
   vpc_zone_identifier       = [
     "${aws_subnet.rancher_ha_a.id}",
-    "${aws_subnet.rancher_ha_b.id}",
-    "${aws_subnet.rancher_ha_c.id}"
+    "${aws_subnet.rancher_ha_b.id}"
   ]
 
   tag {

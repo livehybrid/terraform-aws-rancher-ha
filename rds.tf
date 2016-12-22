@@ -7,8 +7,7 @@ resource "aws_db_subnet_group" "rancher_ha" {
 
   subnet_ids = [
     "${aws_subnet.rancher_ha_a.id}",
-    "${aws_subnet.rancher_ha_b.id}",
-    "${aws_subnet.rancher_ha_c.id}",
+    "${aws_subnet.rancher_ha_b.id}"
   ]
 
   tags {
@@ -31,6 +30,6 @@ resource "aws_rds_cluster" "rancher_ha" {
   master_username        = "${var.database_username}"
   master_password        = "${var.database_password}"
   db_subnet_group_name   = "${aws_db_subnet_group.rancher_ha.name}"
-  availability_zones     = ["${var.region}a", "${var.region}b", "${var.region}c"]
+  availability_zones     = ["${var.region}a", "${var.region}b"]
   vpc_security_group_ids = ["${aws_security_group.rancher_ha_allow_db.id}"]
 }
